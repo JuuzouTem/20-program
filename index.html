@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYT Çalışma Programım</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --primary-text: #e0e0e0;
+            --secondary-text: #b3b3b3;
+            --accent-color: #03dac6;
+            --border-color: #333;
+            --progress-bar-bg: #444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        #progress-container {
+            width: 100%;
+            background-color: var(--progress-bar-bg);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 3px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 25px;
+            background: linear-gradient(90deg, #03dac6, #6200ee);
+            border-radius: 8px;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease-in-out;
+        }
+
+        #day-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .day-btn {
+            background-color: var(--card-bg);
+            color: var(--primary-text);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .day-btn:hover {
+            background-color: #2a2a2a;
+            transform: translateY(-2px);
+        }
+
+        .day-btn.active-day {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: bold;
+            border-color: var(--accent-color);
+        }
+
+        .task-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .task-header h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .task-time {
+            font-weight: bold;
+            font-size: 1.1em;
+            background-color: #333;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .task-details ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-details li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .task-details li input[type="checkbox"] {
+            margin-right: 15px;
+            min-width: 20px;
+            min-height: 20px;
+            cursor: pointer;
+        }
+        
+        .video-duration {
+            margin-left: auto;
+            color: var(--secondary-text);
+            font-style: italic;
+        }
+
+        #daily-total {
+            text-align: right;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>20 Günlük TYT Kamp Planı</h1>
+
+        <h2>Genel İlerleme</h2>
+        <div id="progress-container">
+            <div id="progress-bar">0%</div>
+        </div>
+
+        <nav id="day-nav"></nav>
+
+        <h2 id="day-title"></h2>
+        <div id="task-details-container"></div>
+        <div id="daily-total"></div>
+    </div>
+
+    <script>
+    const planData = [
+        // ... BURAYA BÜYÜK JS VERİSİ GELECEK ...
+    {
+        day: 1,
+        totalTime: "6 Saat 28 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "4 Saat 20 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "13.Gün - Video 1 (Bölme)", duration: "47:34" },
+                { name: "13.Gün - Video 2 (Bölünebilme)", duration: "1:24:15" },
+                "5 Test Çözülecek (Bölme-Bölünebilme)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 33 Dakika", details: [
+                "Fizik: 8. Gün - Kuvvet 2 (36:57)",
+                "Kimya: Video 8 - Periyodik Sistem (55:33)"
+            ]}
+        ]
+    },
+    {
+        day: 2,
+        totalTime: "6 Saat 32 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "4 Saat 28 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "15.Gün - Video 1 (Ebob Ekok-1)", duration: "1:13:14" },
+                { name: "15.Gün - Video 2 (Ebob Ekok-2)", duration: "59:23" },
+                "5 Test Çözülecek (EBOB-EKOK)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 29 Dakika", details: [
+                "Biyoloji: 4. Gün - Lipitler (21:53)",
+                "Kimya: Video 9 - Elementlerin Sınıflandırılması (1:06:51)"
+            ]}
+        ]
+    },
+    {
+        day: 3,
+        totalTime: "7 Saat 12 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "4 Saat 49 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "17.Gün - Video 1 (Denklemler-1)", duration: "52:49" },
+                { name: "17.Gün - Video 2 (Denklemler-2)", duration: "21:23" },
+                { name: "19.Gün - Video 1 (Basit Eşitsizlikler-1)", duration: "1:06:32" },
+                "5 Test Çözülecek (Denklemler + Eşitsizlikler Giriş)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 48 Dakika", details: [
+                "Fizik: 9. Gün - Kuvvet 3+4 (56:51)",
+                "Kimya: Video 10 - Periyodik Özellikler Değişimi 1 (50:55)"
+            ]}
+        ]
+    },
+    {
+        day: 4,
+        totalTime: "6 Saat 12 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "4 Saat 15 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "19.Gün - Video 2 (Basit Eşitsizlikler-2)", duration: "38:27" },
+                { name: "21.Gün - Video 1 (Mutlak Değer-1)", duration: "1:13:53" },
+                "5 Test Çözülecek (Eşitsizlikler Devam + Mutlak Değer Giriş)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 22 Dakika", details: [
+                "Biyoloji: 5. Gün - Proteinler (21:53)",
+                "Kimya: Video 11 - Periyodik Özellikler Değişimi 2 (1:05:09)"
+            ]}
+        ]
+    },
+    {
+        day: 5,
+        totalTime: "5 Saat 26 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "3 Saat 15 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "21.Gün - Video 2 (Mutlak Değer-2)", duration: "51:42" },
+                "5 Test Çözülecek (Mutlak Değer Devam)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 36 Dakika", details: [
+                "Fizik: 11. Gün - İş, Güç, Enerji 1+2 (1:00:11)",
+                "Kimya: Video 12 - Kimyasal Türler (35:43)"
+            ]}
+        ]
+    },
+    {
+        day: 6,
+        totalTime: "6 Saat 40 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "4 Saat 12 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "23.Gün - Video 1 (Üslü Sayılar-1)", duration: "1:18:48" },
+                { name: "23.Gün - Video 2 (Üslü Sayılar-2)", duration: "30:36" },
+                "5 Test Çözülecek (Üslü Sayılar)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 53 Dakika", details: [
+                "Biyoloji: 6. Gün - Enzimler+Vitaminler (44:10)",
+                "Kimya: Video 13 - Güçlü Etkileşimler (1:08:49)"
+            ]}
+        ]
+    },
+    {
+        day: 7,
+        totalTime: "6 Saat 13 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["4 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "3 Saat 48 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "25.Gün - Video 1 (Köklü Sayılar-1)", duration: "1:15:05" },
+                "5 Test Çözülecek (Üslü Bitiş + Köklü Giriş)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 50 Dakika", details: [
+                "Fizik: 12. Gün - İş, Güç, Enerji 3+4 (54:47)",
+                "Kimya: Video 14 - Çok Kullanılan Anyon ve Katyonlar (55:00)"
+            ]}
+        ]
+    },
+    {
+        day: 8,
+        totalTime: "5 Saat 6 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "30 Dakika", details: ["3 Paragraf Testi Çözülecek (Bölüm 1 Bitiş)"] },
+            { subject: "Matematik", time: "3 Saat 20 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "25.Gün - Video 2 (Köklü Sayılar-2)", duration: "59:54" },
+                "5 Test Çözülecek (Köklü Sayılar Devam)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 16 Dakika", details: [
+                "Biyoloji: 7. Gün - Nükleik Asitler (26:27)",
+                "Kimya: Video 15 - Güçlü Etkileşimler Test (49:14)"
+            ]}
+        ]
+    },
+    {
+        day: 9,
+        totalTime: "6 Saat 24 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "40 Dakika", details: ["5 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "3 Saat 56 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "27.Gün - Video 1 (Çarpanlara Ayırma-1)", duration: "52:46" },
+                { name: "27.Gün - Video 2 (Çarpanlara Ayırma-2)", duration: "43:02" },
+                "5 Test Çözülecek (Çarpanlara Ayırma)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 48 Dakika", details: [
+                "Fizik: 14. Gün - Isı ve Sıcaklık 1+2 (46:02)",
+                "Kimya: Video 16 - Kovalent Bağ (1:01:36)"
+            ]}
+        ]
+    },
+    {
+        day: 10,
+        totalTime: "5 Saat 9 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "40 Dakika", details: ["5 Paragraf Testi Çözülecek"] },
+            { subject: "Matematik", time: "3 Saat 7 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "29.Gün - Video 1 (Oran Orantı-1)", duration: "52:11" },
+                "5 Test Çözülecek (Ç.Ayırma Bitiş + O.Orantı Giriş)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek"
+            ]},
+            { subject: "Fen Bilimleri", time: "1 Saat 22 Dakika", details: [
+                "Biyoloji: 8. Gün - Metabolizma ve ATP (26:54)",
+                "Kimya: Video 17 - Kovalent Bileşiklerin İsimlendirilmesi (54:58)"
+            ]}
+        ]
+    },
+    {
+        day: 11,
+        totalTime: "6 Saat 11 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "45 Dakika", details: ["6 Paragraf Testi Çözülecek (Bölüm 2 Bitiş)"] },
+            { subject: "Matematik", time: "2 Saat 56 Dakika", details: [
+                "Konu Anlatım Videoları İzlenecek:",
+                { name: "29.Gün - Video 2 (Oran Orantı-2)", duration: "1:06:12" },
+                "4 Test Çözülecek (Oran Orantı Bitiş)",
+                "Yanlış/Boş Soru Çözümleri İzlenecek",
+                "🎉 MATEMATİK PROGRAMI BİTTİ! 🎉"
+            ]},
+            { subject: "Fen Bilimleri", time: "2 Saat 30 Dakika", details: [
+                "Fizik: 15. Gün - Isı ve Sıcaklık 3+4 (1:09:13)",
+                "Kimya: Video 18 - Zayıf Etkileşimler (1:20:57)"
+            ]}
+        ]
+    },
+    {
+        day: 12,
+        totalTime: "2 Saat 21 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "35 Dakika", details: ["6 Paragraf Testi Çözülecek"] },
+            { subject: "Fen Bilimleri", time: "1 Saat 46 Dakika", details: [
+                "Biyoloji: 9. Gün - Hücre Organelleri 1+2 (56:09)",
+                "Kimya: Video 19 - Fiziksel ve Kimyasal Özellikler (49:47)"
+            ]}
+        ]
+    },
+    {
+        day: 13,
+        totalTime: "2 Saat 41 Dakika",
+        tasks: [
+            { subject: "Paragraf", time: "40 Dakika", details: [
+                "7 Paragraf Testi Çözülecek (Son Bölüm Bitiş)",
+                "🎉 PARAGRAF PROGRAMI BİTTİ! 🎉"
+            ]},
+            { subject: "Fen Bilimleri", time: "2 Saat 1 Dakika", details: [
+                "Fizik: 16. Gün - Isı ve Sıcaklık 5+6 (1:03:23)",
+                "Kimya: Video 20 - Maddenin Halleri (57:16)"
+            ]}
+        ]
+    },
+    {
+        day: 14,
+        totalTime: "1 Saat 32 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "1 Saat 32 Dakika", details: [
+                "Biyoloji: 10. Gün - Madde Alışverişleri+Bilimsel Çalışma (52:09)",
+                "Kimya: Video 21 - Katılar (39:47)"
+            ]}
+        ]
+    },
+    {
+        day: 15,
+        totalTime: "1 Saat 56 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "1 Saat 56 Dakika", details: [
+                "Fizik: 18. Gün - Genleşme 1+2 (45:01)",
+                "Kimya: Video 22 - Sıvılar (1:10:41)"
+            ]}
+        ]
+    },
+    {
+        day: 16,
+        totalTime: "1 Saat 10 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "1 Saat 10 Dakika", details: [
+                "Biyoloji: 11. Gün - Sınıflandırmaya Giriş (23:32)",
+                "Kimya: Video 23 - Gazlar (46:45)"
+            ]}
+        ]
+    },
+    {
+        day: 17,
+        totalTime: "1 Saat 29 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "1 Saat 29 Dakika", details: [
+                "Fizik: 19. Gün - Elektrostatik 1+2 (57:03)",
+                "Kimya: Video 24 - Doğa ve Kimya (31:36)",
+                "🎉 KİMYA PROGRAMI BİTTİ! 🎉"
+            ]}
+        ]
+    },
+    {
+        day: 18,
+        totalTime: "1 Saat 25 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "1 Saat 25 Dakika", details: [
+                "Fizik: 20. Gün - Elektrostatik 3+4 (57:34)",
+                "Biyoloji: 12. Gün - Bakteri ve Arke (27:02)"
+            ]}
+        ]
+    },
+    {
+        day: 19,
+        totalTime: "1 Saat 18 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "1 Saat 18 Dakika", details: [
+                "Fizik: 21. Gün - Elektrostatik 5+6 (41:53)",
+                "🎉 FİZİK PROGRAMI BİTTİ! 🎉",
+                "Biyoloji: 13. Gün - Protista+Bitki / Mantar (35:55)"
+            ]}
+        ]
+    },
+    {
+        day: 20,
+        totalTime: "57 Dakika",
+        tasks: [
+            { subject: "Fen Bilimleri", time: "57 Dakika", details: [
+                "Biyoloji: 14. Gün - Omurgasız+Omurgalı Hayvanlar (56:39)",
+                "🎉 TEBRİKLER! TÜM PROGRAMI TAMAMLADIN! 🎉"
+            ]}
+        ]
+    }
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dayNav = document.getElementById('day-nav');
+        const taskContainer = document.getElementById('task-details-container');
+        const dayTitle = document.getElementById('day-title');
+        const dailyTotalEl = document.getElementById('daily-total');
+
+        function createDayButtons() {
+            planData.forEach(dayData => {
+                const btn = document.createElement('button');
+                btn.className = 'day-btn';
+                btn.textContent = `Gün ${dayData.day}`;
+                btn.dataset.day = dayData.day;
+                btn.addEventListener('click', () => displayDayDetails(dayData.day));
+                dayNav.appendChild(btn);
+            });
+        }
+
+        function displayDayDetails(dayNumber) {
+            const dayData = planData.find(d => d.day === dayNumber);
+            if (!dayData) return;
+
+            // Update active button
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.toggle('active-day', btn.dataset.day == dayNumber);
+            });
+
+            dayTitle.textContent = `Gün ${dayNumber} Görevleri`;
+            taskContainer.innerHTML = '';
+
+            dayData.tasks.forEach((task, taskIndex) => {
+                const card = document.createElement('div');
+                card.className = 'task-card';
+
+                let detailsHtml = '<ul>';
+                task.details.forEach((item, itemIndex) => {
+                    const checkboxId = `day-${dayNumber}-task-${taskIndex}-item-${itemIndex}`;
+                    
+                    if (typeof item === 'object' && item.name) {
+                        detailsHtml += `<li><input type="checkbox" id="${checkboxId}" data-id="${checkboxId}"><label for="${checkboxId}">${item.name}</label><span class="video-duration">${item.duration}</span></li>`;
+                    } else {
+                        // Bold headers
+                        if(item.includes(":") || item.includes("🎉")){
+                             detailsHtml += `<li style="background-color: transparent; font-weight: bold; margin-top:10px;"><label for="${checkboxId}">${item}</label></li>`;
+                        } else {
+                            detailsHtml += `<li><input type="checkbox" id="${checkboxId}" data-id="${checkboxId}"><label for="${checkboxId}">${item}</label></li>`;
+                        }
+                    }
+                });
+                detailsHtml += '</ul>';
+
+                card.innerHTML = `
+                    <div class="task-header">
+                        <h3>${task.subject}</h3>
+                        <span class="task-time">${task.time}</span>
+                    </div>
+                    <div class="task-details">${detailsHtml}</div>
+                `;
+                taskContainer.appendChild(card);
+            });
+            
+            dailyTotalEl.textContent = `GÜNLÜK TOPLAM SÜRE: ${dayData.totalTime}`;
+            
+            loadProgress();
+            attachCheckboxListeners();
+        }
+        
+        function attachCheckboxListeners() {
+            document.querySelectorAll('.task-details input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', saveProgress);
+            });
+        }
+
+        function saveProgress(event) {
+            const checkbox = event.target;
+            const id = checkbox.dataset.id;
+            localStorage.setItem(id, checkbox.checked);
+            updateProgressBar();
+        }
+
+        function loadProgress() {
+            document.querySelectorAll('.task-details input[type="checkbox"]').forEach(checkbox => {
+                const id = checkbox.dataset.id;
+                const isChecked = localStorage.getItem(id) === 'true';
+                checkbox.checked = isChecked;
+            });
+        }
+
+        function updateProgressBar() {
+            const allCheckboxes = [];
+            planData.forEach((dayData, dayIndex) => {
+                 dayData.tasks.forEach((task, taskIndex) => {
+                     task.details.forEach((item, itemIndex) => {
+                        // Items that are not just headers
+                        if (!(item.includes(":") || item.includes("🎉"))) {
+                           allCheckboxes.push(`day-${dayData.day}-task-${taskIndex}-item-${itemIndex}`);
+                        }
+                     });
+                 });
+            });
+
+            const totalTasks = allCheckboxes.length;
+            const completedTasks = allCheckboxes.filter(id => localStorage.getItem(id) === 'true').length;
+            
+            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+            
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${Math.round(percentage)}%`;
+        }
+
+        // Initialize
+        createDayButtons();
+        displayDayDetails(1);
+        updateProgressBar();
+    });
+    </script>
+</body>
+</html>
